@@ -1,4 +1,4 @@
-import {test} from '@playwright/test';
+import {test, expect} from '@playwright/test';
 
 
 test.beforeEach('before each', async ({ page }) => {
@@ -66,4 +66,33 @@ test('locating child elements', async({page})=>{
     
 })
 
+test('Locating parent elements', async({page}) => {
+    
+    await page.locator('nb-card', {hasText: 'Using the Grid'}).getByRole('textbox',{name: 'Email'}).click()
+    await page.locator('nb-card', {has: page.locator('#inputEmail1')}).getByRole('textbox', {name: 'Email'}).click()
+
+    await page.locator('nb-card').filter({hasText: 'Basic form'}).getByRole('textbox', {name: 'Email'}).click()
+
+    await page.locator('nb-card').filter({has: page.locator('.status-danger')}).getByRole('textbox', {name: 'Password'}).click()
+    
+    await page.locator('nb-card').filter({has: page.locator('nb-checkbox')}).filter({hasText: 'Sign In'}).click()
+
+    await page.locator('nb-card', {hasText: 'Using the Grid'}).locator('..').getByRole('textbox', {name: 'Email'}).click()
+
+    // await page.locator(':text-is("Using the Grid")').locator('..').getByRole('textbox', {name: 'Email'}).click()
+
+})
+
+test('Reusing the locators', async({page})=>{
+    
+    const basicForm = page.locator('nb-card').filter({hasText: 'Basic form'})
+    const emailInput = basicForm.getByRole('textbox',{name: 'Email'})
+
+    await emailInput.fill('test@test.com')
+    await basicForm.getByRole('textbox',{name: 'Password'}).fill('test123')
+    await basicForm.locator('nb-checkbox').click()
+    await basicForm.getByRole('button', {name: 'Submit'}).click()
+
+    await expect(emailInput).toHaveValue('test@test.com')
+})
 
