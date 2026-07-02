@@ -28,4 +28,32 @@ test.describe('Form Layouts', ()=>{
         await expect(emailInputField).toHaveValue('saksam@gmail.com')
     })
 
+    test('Radio button', async({page})=>{
+        await page.locator('nb-card',{hasText: 'Using the Grid'})
+                  .getByRole('radio',{name: 'Option 1'})
+                  .check({force: true});
+
+        await page.locator('nb-card',{hasText: 'Using the Grid'})
+                  .getByLabel('Option 2')
+                  .check({force: true});    
+                  
+        //Generic assertion
+        const radioButtonStatus = await page.locator('nb-card', {hasText: 'Using the Grid'})
+                                             .getByRole('radio', {name: 'Option 2'})
+                                             .isChecked();
+
+        expect(radioButtonStatus).toBeTruthy()     
+        
+        //Locator assertion
+        expect(await page.locator('nb-card', {hasText: 'Using the Grid'}).getByRole('radio', {name: 'Option 2'})).toBeChecked()
+
+        await page.locator('nb-card', {hasText: 'Using the Grid'})
+                  .getByRole('radio', {name: 'Option 1'})
+                  .check({force: true});    
+        const radioValue = await page.locator('nb-card', {hasText: 'Using the Grid'})
+                               .getByRole('radio', {name: 'Option 1'})
+                               .isChecked()
+         
+        expect(radioValue).toBeTruthy()                       
+    })
 })
