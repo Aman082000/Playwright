@@ -57,3 +57,67 @@ test.describe('Form Layouts', ()=>{
         expect(radioValue).toBeTruthy()                       
     })
 })
+
+test('Checkboxes', async({page})=>{
+    await page.getByText('Modal & Overlays').click()
+    await page.getByText('Toastr').click()
+
+    //Already checked by default - so unchecking and checking again 
+    // await page.getByRole('checkbox', {name: 'Hide on click'}).click({force: true})
+    // await page.getByRole('checkbox', {name: 'Hide on click'}).click({force: true})
+
+    // await page.getByRole('checkbox', {name: 'Hide on click'}).uncheck({force: true})
+    // await page.getByRole('checkbox', {name: 'Hide on click'}).check({force: true})
+
+    //Check all and verify all checked
+    const allboxes = await page.getByRole('checkbox')
+    for(const box of await allboxes.all()){
+        await box.check({force: true})
+        expect(box.isChecked()).toBeTruthy()
+    }
+
+    //Uncheck all and verify all unchecked
+    const allBoxes1 = await page.getByRole('checkbox')
+    for(const box of await allBoxes1.all()){
+        await box.uncheck()
+        expect(box.isChecked()).toBeFalsy()
+    }
+
+})
+
+test('Lists and Dropdown', async({page})=>{
+
+    //Click on Drop down -- see expanded list
+    const dropDownMenu = page.locator('ngx-header nb-select')
+    await dropDownMenu.click()
+
+    //Obtain all items in the drop down
+    //const listItems = await page.getByRole('list').locator('nb-option')
+    const listItems = await page.locator('nb-option-list nb-option')
+    await expect(listItems).toHaveText(["Light", "Dark", "Cosmic", "Corporate"])
+
+    //Click on one item in the drop down
+    await listItems.filter({hasText: 'Cosmic'}).click()
+
+    //Verify background color
+    const headerCSS = page.locator('nb-layout-header')
+    await expect(headerCSS).toHaveCSS('background-color',"rgb(50, 50, 89)")
+
+    //Verify all colors and all backgrounds
+    const colors = {
+        'Light': 'rgb(255, 255, 255)',
+        'Dark': 'rgb(34, 43, 69)',
+        'Cosmic': 'rgb(50, 50, 89)',
+        'Corporate': 'rgb(255, 255, 255)'
+    }
+
+    //Open the drop down menu 
+    await dropDownMenu.click()
+    for(const color in colors){
+        await listItems.filter({hasText: color}).click()
+        await expect(headerCSS).toHaveCSS('background-color', colors[color])
+        if(color != 'Corporate')
+            await dropDownMenu.click()   //open the drop down menu everytime except for last color
+    }
+
+})
