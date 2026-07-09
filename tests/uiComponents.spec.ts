@@ -210,3 +210,18 @@ test('Web tables Part 2', async({page})=>{
         }
     }
 })
+
+test('Date Picker', async({page})=>{
+    await page.getByText('Forms').click()
+    await page.getByText('Datepicker').click()
+
+    const calenderInputField = page.locator('nb-card-body').getByPlaceholder('Form Picker')
+    await calenderInputField.click()
+
+    await page.locator('[class="day-cell ng-star-inserted"]').getByText('1', {exact: true}).click()
+
+    expect(calenderInputField).toHaveValue('Jul 1, 2026')
+    //await page.pause()
+
+})
+
