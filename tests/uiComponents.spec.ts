@@ -218,10 +218,50 @@ test('Date Picker', async({page})=>{
     const calenderInputField = page.locator('nb-card-body').getByPlaceholder('Form Picker')
     await calenderInputField.click()
 
-    await page.locator('[class="day-cell ng-star-inserted"]').getByText('1', {exact: true}).click()
+    let date = new Date()
+    date.setDate(date.getDate() + 100)
 
-    expect(calenderInputField).toHaveValue('Jul 1, 2026')
+    const expectedDate = date.getDate().toString()
+    const expectedMonth = date.toLocaleString('En-US', {month: 'short'})
+    const expectedYear = date.getFullYear()
+    const dateToAssert = `${expectedMonth} ${expectedDate}, ${expectedYear}`
+
+    await page.locator('[class="day-cell ng-star-inserted"]').getByText(expectedDate, {exact: true}).click()
+
+    expect(calenderInputField).toHaveValue(dateToAssert)
+    console.log(dateToAssert)
     //await page.pause()
 
 })
 
+test('Date Picker 2', async({page})=>{
+    await page.getByText('Forms').click()
+    await page.getByText('Datepicker').click()
+
+    const calenderInputField = page.locator('nb-card-body').getByPlaceholder('Form Picker')
+    await calenderInputField.click()
+
+    let date = new Date()
+    date.setDate(date.getDate() + 200)
+
+    const expectedDate = date.getDate().toString()
+    const expectedMonthLong = date.toLocaleString('En-US', {month: 'long'})
+    const expectedMonthShort = date.toLocaleString('En-US', {month: 'short'})
+    const expectedYear = date.getFullYear()
+    const dateToAssert = `${expectedMonthShort} ${expectedDate}, ${expectedYear}`
+
+    let calendarMonthAndYear = await page.locator('nb-calendar-view-mode').textContent()
+    //console.log(calendarMonthAndYear)
+    const expectedDateInCurrentDateFormat = ` ${expectedMonthLong} ${expectedYear} `
+
+    while(calendarMonthAndYear!=null && !calendarMonthAndYear.includes(expectedDateInCurrentDateFormat)){
+        await page.locator('nb-calendar-pageable-navigation [data-name="chevron-right"]').click()
+        calendarMonthAndYear = await page.locator('nb-calendar-view-mode').textContent()
+    }
+
+    await page.locator('[class="day-cell ng-star-inserted"]').getByText(expectedDate, {exact: true}).click()
+
+    expect(calenderInputField).toHaveValue(dateToAssert)
+    //console.log(dateToAssert)
+
+})
